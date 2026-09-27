@@ -151,7 +151,7 @@
 
   /** نصوصا التاريخ الثابتان لليوم (هجري أم القرى + ميلادي) */
   var hijriText = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { dateStyle: 'long' }).format(todayDate);
-  var gregorianText = new Intl.DateTimeFormat('ar-SA', { dateStyle: 'long' }).format(todayDate);
+  var gregorianText = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', { dateStyle: 'long' }).format(todayDate);
 
   // ربط هالة السماء ولون السديم وطقس الموسم بطالع اليوم الحالي
   if (sky && sky.setTalea) sky.setTalea(currentToday);
@@ -565,7 +565,7 @@
   /** الانتقال إلى طالع تاريخ معيّن: إغلاق النافذة وتحديث السماء والبطاقة */
   function jumpToDateTalea(date, extraNote) {
     closeDateModal();
-    var greg = new Intl.DateTimeFormat('ar-SA', { dateStyle: 'long' }).format(date);
+    var greg = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', { dateStyle: 'long' }).format(date);
     var hijri = '';
     try {
       hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { dateStyle: 'long' }).format(date);
