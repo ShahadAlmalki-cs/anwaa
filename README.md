@@ -76,11 +76,7 @@ python -m http.server 8000
 
 ## 🌐 English Overview
 
-**Anwaa** is an interactive celestial observatory celebrating traditional Arabian
-ethno-astronomy. It bridges ancient desert seasonal reckoning — the *matali'*
-(star risings), the *anwaa* (seasonal mansions) and the agricultural calendars —<img width="1875" height="896" alt="Screenshot 2026-09-27 081736" src="https://github.com/user-attachments/assets/4932ad2d-53e7-42f3-824b-5cda3a34d99d" />
-
-with modern front-end craftsmanship.
+Anwaa is an interactive celestial observatory celebrating traditional Arabian ethno-astronomy. It bridges ancient desert seasonal reckoning — the matali' (star risings), the anwaa (seasonal mansions) and the agricultural calendars — with modern front-end craftsmanship.
 
 ### Highlights
 
@@ -105,7 +101,8 @@ with modern front-end craftsmanship.
 ### 🖼️ Screenshot
 
 <br>
-![Uploading Screenshot 2026-09-27 081736.png…]()
+
+<img width="1875" height="896" alt="Screenshot 2026-09-27 081736" src="https://github.com/user-attachments/assets/85ddcdda-faee-47de-8661-eab45cd7e13d" />
 
 <br><br>
 
