@@ -70,13 +70,16 @@ python -m http.server 8000
 * **كتاب الأنواء في مواسم العرب** — أبو محمد عبد الله بن مسلم ابن قتيبة الدينوري (ت 276 هـ).
 * **تقويم مواسم ومطالع النجوم التراثي لسماء الجزيرة العربية**.
 
+<img width="1132" height="1600" alt="دليل الطوالع" src="https://github.com/user-attachments/assets/e1e7aa6e-35c3-430e-855b-0115a821ae2d" />
+
 ---
 
 ## 🌐 English Overview
 
 **Anwaa** is an interactive celestial observatory celebrating traditional Arabian
 ethno-astronomy. It bridges ancient desert seasonal reckoning — the *matali'*
-(star risings), the *anwaa* (seasonal mansions) and the agricultural calendars —
+(star risings), the *anwaa* (seasonal mansions) and the agricultural calendars —<img width="1875" height="896" alt="Screenshot 2026-09-27 081736" src="https://github.com/user-attachments/assets/4932ad2d-53e7-42f3-824b-5cda3a34d99d" />
+
 with modern front-end craftsmanship.
 
 ### Highlights
@@ -101,7 +104,7 @@ with modern front-end craftsmanship.
 
 ### 🖼️ Screenshot
 
-<sub>📸 <i>Insert preview image here — <code>docs/preview.png</code></i></sub>
+![Uploading Screenshot 2026-09-27 081736.png…]()
 
 <br><br>
 
