@@ -1,0 +1,2343 @@
+/* ============================================================================
+ * style.css — أنماط مرصد «أَنْوَاء: مَطَالِعُ النُّجُومِ وَقَوَاسِيمُ الأَرْضِ»
+ * ----------------------------------------------------------------------------
+ * الفهرسة:
+ *   1)  المتغيّرات وإعادة الضبط الأساسية
+ *   2)  العنوان الرئيسي (Hero)
+ *   3)  بطاقة الطالع والهالة الذهبية
+ *   4)  أزرار المشهد المبدئي (الرصد / تاريخ معيّن)
+ *   5)  زر الرجوع للسماء
+ *   6)  الشريط الزمني الفلكي للمواسم
+ *   7)  زر التحكم بالصوت ومنتقي المدينة
+ *   8)  أزرار البطاقة والإشعار الناعم
+ *   9)  نافذة النبذة الزجاجية
+ *   10) نافذة التقويم الفلكي
+ *   11) ويدجت الطقس ودليل الطالع العملي
+ *   12) الوسائط المتجاوبة واحترام تقليل الحركة
+ * ========================================================================== */
+
+/* ============================================================================
+ * 1) المتغيّرات وإعادة الضبط الأساسية
+ * ========================================================================== */
+
+/* صنف موحّد لكل أيقوناتنا الخطية (.ico): خط رفيع بلا تعبئة، يرث لون النص */
+.ico {
+  width: 1em;
+  height: 1em;
+  stroke: currentColor;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+:root {
+  --bg-space: #040714;
+  --space-indigo: #070d24;
+  --space-navy: #0b1530;
+  /* ذهب نجمي هادئ + فضة عاجية للعناوين والأيقونات */
+  --gold-accent: #d4af37;
+  --gold-soft: #c4b595;
+  --ivory: #f4f1ea;
+
+  /* --- الزجاج الفضائي (Cosmic Glass) --- */
+  --glass-bg: rgba(10, 14, 26, 0.65);
+  --glass-bg-strong: rgba(10, 14, 26, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(16px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  --text-main: var(--ivory);
+  --text-muted: #8b9bb4;
+  --card-bg: var(--glass-bg);
+  --card-border: var(--glass-border);
+
+  --dock-bottom: calc(max(14px, 2.2vh) + env(safe-area-inset-bottom, 0px));
+  --ease-soft: cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+
+/* ============================================================================
+ * 1.b) فئات الزجاج الفضائي — قابلة لإعادة الاستخدام في كل البطاقات والأزرار
+ * ========================================================================== */
+
+/* توهّج نجمي ناعم يُرسم خلف أي سطح زجاجي */
+.cosmic-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+/* حافة زجاجية فائقة الدقة: خط شعاعي دقيق عند الحواف أعلى شفافية من الوسط */
+.cosmic-edge {
+  position: relative;
+}
+
+.cosmic-edge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.02) 38%,
+      rgba(212, 175, 55, 0.06) 72%,
+      rgba(255, 255, 255, 0.01) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-space);
+  color: var(--text-main);
+  font-family: 'Tajawal', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 24px calc(112px + env(safe-area-inset-bottom, 0px));
+  overflow-x: hidden;
+  /* قاعدة سوداء نيليّة عميقة: لا تنافس النجوم ولا ترفع الإضاءة العامة. */
+  background:
+    linear-gradient(145deg, #02040d 0%, var(--bg-space) 48%, #030611 100%);
+  isolation: isolate;
+}
+
+/* طبقة ضوء خافتة اختيارية خلف المحتوى، تمزج النيلي في السواد دون بقع. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(132deg,
+    rgba(14, 25, 65, 0.16) 0%,
+    rgba(49, 28, 74, 0.035) 42%,
+    rgba(133, 87, 43, 0.02) 58%,
+    rgba(2, 4, 13, 0.1) 100%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
+}
+
+/* منصة الفضاء الحيّة: تغطّي الشاشة خلف كل العناصر ولا تعترض التفاعل */
+#skyCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.96;
+}
+
+.container {
+  max-width: 650px;
+  width: 100%;
+  /* التوسيط الأفقي الكامل: 100% في منتصف الشاشة على كل المقاسات */
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* العنصر المُثبَّت (site-header) خارج التدفّق، فنمنح مسرح البطاقة
+     حشوة رأسية ثابتة تُبقيه غير متداخل معه على كل المقاسات. */
+  padding-top: clamp(120px, 22vh, 190px);
+}
+
+/* ============================================================================
+ * 2) كتلة العنوان العلوية: «أنواء» بخط Aref Ruqaa الرقعة الأصيل
+ * ----------------------------------------------------------------------------
+ * التوسيط هنا توسيطٌ مطلق عن قصد: العنوان يجب أن يقع في عين الشاشة تماماً
+ * مهما كان اتجاه الصفحة (RTL هنا) أو عرضها. لذلك نأخذ العنصر من التدفّق
+ * بـ position: absolute ونثبّته على المحور الأفقي بـ left: 50% مع
+ * translateX(-50%)، ونمنحه عرضاً كاملاً محدوداً بـ max-width.
+ * الميزة المزدوجة: التوسيط لا يعتمد على تطوّر flex ولا على عرض متغيّر،
+ * ويبقى مضموناً لو ضاقت الشاشة أو اتّسعت. يبقى المحور الرأسي طبيعياً.
+ * النص نقي بلا تشكيل ولا تطويل: الرقعة لا تحتاجهما والنسخ المشكول يشوّهه.
+ * ========================================================================== */
+
+.site-header {
+  position: absolute;
+  top: clamp(14px, 3.4vh, 34px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100%;
+  max-width: 600px;
+  margin: 0;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* محاذاة سنتر أفقية داخل العرض المحدود */
+  justify-content: center;
+  text-align: center;
+  text-wrap: balance;
+  /* الكتلة نصّية فقط: نمنعها من اعتراض أي نقرة على الأزرار أسفلها */
+  pointer-events: none;
+}
+
+/* لكن النص نفسه يبقى قابلاً للتحديد/النسخ */
+.site-header>* {
+  pointer-events: auto;
+}
+
+/* الاسم: Aref Ruqaa بوزن 700 + عاجٍ فلكيّ ناصع مع توهجٍ خافت متناسق */
+.site-title {
+  font-family: 'Aref Ruqaa', 'Tajawal', serif;
+  font-weight: 700;
+  font-size: clamp(3rem, 11vw, 4.6rem);
+  line-height: 1.45;         /* الرقعة تحتاج مساحة رأسية أكبر من النماذج الأخرى */
+  letter-spacing: 0;
+  margin: 0 0 4px;
+  background: linear-gradient(180deg, #fffdf8 0%, #f4f1ea 55%, #d8cfba 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* توهج خافت متناسق: ظلّ أساس + هالة عاجية هادئة + طبقة ذهبية عميقة */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 12px rgba(244, 241, 234, 0.18))
+    drop-shadow(0 0 26px rgba(212, 175, 55, 0.12));
+  animation: hero-glow 7s ease-in-out infinite;
+}
+
+/* العبارة التوضيحية: خط ناعم متناسق (Tajawal) بأوزان خفيفة */
+.site-sub {
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 300;
+  color: var(--text-muted);
+  font-size: clamp(0.86rem, 3.4vw, 1rem);
+  letter-spacing: 1.2px;
+  margin: 0;
+  line-height: 1.9;
+}
+
+@keyframes hero-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 0 12px rgba(244, 241, 234, 0.18))
+      drop-shadow(0 0 26px rgba(212, 175, 55, 0.12));
+  }
+
+  50% {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 0 22px rgba(244, 241, 234, 0.3))
+      drop-shadow(0 0 40px rgba(212, 175, 55, 0.2));
+  }
+}
+
+/* فاصل ذهبي رفيع تحت العنوان يكسر حدّة العتمة */
+.site-header::after {
+  content: '';
+  display: block;
+  width: min(190px, 55%);
+  height: 1px;
+  margin: 2px auto 14px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.45), transparent);
+}
+
+/* ============================================================================
+ * 3) بطاقة الطالع والهالة الذهبية
+ * ========================================================================== */
+
+/* مسرح البطاقة: يحمل الهالة الذهبية خلف البطاقة.
+   الهالة تتجاوز عرض البطاقة (١٥٠٪) وتُقصّ هنا بدل أن توسّع
+   صندوق التمرير في الصفحة — فتُلغى الإزاحة الأفقية على الجوال. */
+.card-stage {
+  position: relative;
+  overflow-x: clip;
+  overflow-y: visible;
+  margin-inline: -1px;
+  padding-inline: 1px;
+}
+
+.card-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  height: 210%;
+  transform: translate(-50%, -50%) scale(0.7);
+  background: radial-gradient(ellipse at center,
+      rgba(229, 185, 103, 0.26) 0%,
+      rgba(229, 185, 103, 0.12) 38%,
+      rgba(229, 185, 103, 0) 72%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+/* المشهد المبدئي: البطاقة مخفيّة تماماً ولا تلتقط أي تفاعل */
+.talea-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur) saturate(1.15);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.15);
+  border-radius: 20px;
+  padding: 40px 26px 32px;
+  box-shadow: var(--glass-shadow), var(--glass-inset),
+    0 0 46px rgba(146, 160, 214, 0.07);
+  position: relative;
+  /* على الشاشات القصيرة تُمرّر البطاقة داخلياً بدل دفع الصفحة */
+  max-height: calc(100dvh - 170px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 185, 103, 0.35) transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(26px) scale(0.97);
+  filter: blur(14px);
+  outline: none;
+  transition: opacity 0.5s ease, transform 0.55s ease, filter 0.5s ease,
+    visibility 0s linear 0.5s;
+  will-change: opacity, transform, filter;
+}
+
+/* لحظة الرصد: انبثاق ناعم من المنتصف مع تدرّج للأعلى وزوال الضبابية */
+body.is-observed .talea-card {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  filter: blur(0);
+  transition: opacity 1.15s ease-out,
+    transform 1.35s var(--ease-soft),
+    filter 1.15s ease-out,
+    visibility 0s linear 0s;
+  transition-delay: 0.06s;
+}
+
+/* توهّج ذهبي ينتشر خلف البطاقة عند الرصد */
+body.is-observed .card-glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 1.7s ease-out, transform 2.1s var(--ease-soft);
+}
+
+/* تتابع ناعم لمحتويات البطاقة: زر الرجوع ثم الشارة ثم العنوان ثم النصّ */
+.talea-card>* {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.8s ease;
+}
+
+/* انتقال موحّد بين الطوالع: تلاشٍ سريع للمحتوى القديم ثم ظهور ناعم للجديد.
+   نعتمد opacity و transform فقط — بلا إعادة حساب تخطيط وبلا وميض. */
+body.is-swapping .talea-card>* {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+body.is-observed .talea-card>* {
+  opacity: 1;
+  transform: none;
+}
+
+body.is-observed .talea-card>*:nth-child(1) {
+  transition-delay: 0.20s;
+}
+
+body.is-observed .talea-card>*:nth-child(2) {
+  transition-delay: 0.30s;
+}
+
+body.is-observed .talea-card>*:nth-child(3) {
+  transition-delay: 0.42s;
+}
+
+body.is-observed .talea-card>*:nth-child(4) {
+  transition-delay: 0.54s;
+}
+
+body.is-observed .talea-card>*:nth-child(5) {
+  transition-delay: 0.66s;
+}
+
+.season-badge {
+  display: inline-block;
+  background: rgba(10, 14, 26, 0.65);
+  color: var(--gold-accent);
+  padding: 5px 16px;
+  border-radius: 30px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  margin-bottom: 14px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.12);
+}
+
+.star-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.proverb-box {
+  margin-top: 18px;
+  padding: 16px;
+  border-right: 1px solid rgba(212, 175, 55, 0.55);
+  background: rgba(10, 14, 26, 0.65);
+  border-radius: 4px 12px 12px 4px;
+  font-family: 'Amiri', serif;
+  font-size: 1.18rem;
+  color: var(--ivory);
+  line-height: 1.75;
+  font-style: italic;
+}
+
+.date-info {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+ * 4) أزرار المشهد المبدئي: الرصد + تاريخ معيّن (تظهر وتتلاشى معاً)
+ * ========================================================================== */
+
+.hero-actions {
+  position: fixed;
+  left: 50%;
+  /* فوق شريط المواسم مباشرة بهامش ثابت 96px مهما كان ارتفاع الشاشة */
+  bottom: calc(var(--dock-bottom) + 96px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 24px);
+  z-index: 3;
+  transition: opacity 0.65s ease, transform 0.7s var(--ease-soft);
+}
+
+/* يتلاشى الزرّان بهدوء لحظة النقر، ويعودان بعد الرجوع إلى السماء */
+body.is-observing .hero-actions {
+  opacity: 0;
+  transform: translateX(-50%) translateY(16px) scale(0.94);
+  pointer-events: none;
+}
+
+/* زر زجاجي مطرّز بنور ذهبي خافت في أسفل الشاشة */
+.observe-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 32px;
+  font-family: 'Amiri', serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.4px;
+  color: var(--ivory);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 3;
+  backdrop-filter: var(--glass-blur) saturate(1.15);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.15);
+  box-shadow: var(--glass-shadow), var(--glass-inset),
+    0 0 26px rgba(212, 175, 55, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  animation: observe-breath 4.8s ease-in-out infinite;
+  transition: opacity 0.65s ease,
+    transform 0.7s var(--ease-soft),
+    box-shadow 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* تطريز ذهبي داخلي رفيع */
+.observe-btn::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.observe-btn:hover,
+.observe-btn:focus-visible {
+  color: #fffaf0;
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), var(--glass-inset),
+    0 0 48px rgba(212, 175, 55, 0.22);
+  outline: none;
+}
+
+.observe-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3),
+    0 8px 32px 0 rgba(0, 0, 0, 0.5),
+    0 0 48px rgba(212, 175, 55, 0.22);
+}
+
+/* الزرّان داخل الحاوية هما من يتلاشى الآن (لا الزر وحده) */
+body.is-observing .hero-actions .observe-btn {
+  animation: none;
+}
+
+/* زر «طالع تاريخ معيّن»: يشارك .observe-btn كل التنسيقات الزجاجية الذهبية،
+   وهنا الفروق الطفيفة فقط: نبض معكوس الإيقاع وتوهّج أخفت قليلاً. */
+.date-btn {
+  animation-delay: -2.4s;
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--glass-shadow), var(--glass-inset),
+    0 0 18px rgba(212, 175, 55, 0.07);
+}
+
+.date-btn:hover,
+.date-btn:focus-visible {
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 42px rgba(229, 185, 103, 0.3);
+}
+
+.date-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(229, 185, 103, 0.35),
+    0 14px 42px rgba(0, 0, 0, 0.55),
+    0 0 42px rgba(229, 185, 103, 0.3);
+}
+
+.observe-star {
+  display: inline-block;
+  color: var(--gold-accent);
+  font-size: 1.1rem;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(229, 185, 103, 0.85);
+  animation: observe-twinkle 2.9s ease-in-out infinite;
+}
+
+/* وميض خفيف يعبر الزر من حين لآخر */
+.observe-gleam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  left: -60%;
+  background: linear-gradient(100deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 246, 224, 0.22) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  animation: observe-gleam 6.2s ease-in-out infinite;
+}
+
+@keyframes observe-breath {
+
+  0%,
+  100% {
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 20px rgba(229, 185, 103, 0.14);
+  }
+
+  50% {
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0 42px rgba(229, 185, 103, 0.32);
+  }
+}
+
+@keyframes observe-twinkle {
+
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.9) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(12deg);
+  }
+}
+
+@keyframes observe-gleam {
+
+  0%,
+  58% {
+    left: -60%;
+    opacity: 0;
+  }
+
+  68% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 132%;
+    opacity: 0;
+  }
+}
+
+/* ============================================================================
+ * 5) زر الرجوع للسماء: صغير وأنيق في أعلى زاوية البطاقة
+ * ========================================================================== */
+
+.back-btn {
+  position: absolute;
+  top: 14px;
+  inset-inline-start: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.back-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.back-btn:hover,
+.back-btn:focus-visible {
+  color: var(--gold-accent);
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 26, 0.82);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+  outline: none;
+}
+
+/* ============================================================================
+ * 6) الشريط الزمني الفلكي لمواسم السنة الستة
+ * ========================================================================== */
+
+.timeline-bar {
+  position: fixed;
+  bottom: var(--dock-bottom);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(94vw, 820px);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  transition: transform 0.6s var(--ease-soft), opacity 0.5s ease;
+}
+
+body.is-observed .timeline-bar {
+  transform: translateX(-50%) translateY(2px);
+  opacity: 0.94;
+}
+
+.timeline-nav {
+  position: relative;
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur) saturate(1.2);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.2);
+  box-shadow: var(--glass-shadow), var(--glass-inset),
+    0 0 28px rgba(212, 175, 55, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* تمرير أفقي ناعم مع احترام Inertia، وبموضع التمرير التلقائي للمحورين */
+.timeline-scroll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  padding: 2px 4px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;   /* يمنع تمرير الصفحة عند تجاوز الشريط */
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.season-btn {
+  position: relative;
+  flex: 1 0 auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  min-width: 82px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.25;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  white-space: nowrap;
+}
+
+.season-btn-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Amiri', serif;
+  font-size: 0.98rem;
+  letter-spacing: 0.3px;
+}
+
+/* أيقونة الموسم في الشريط الزمني: خطية رفيعة لا إيموجي */
+.season-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  opacity: 0.75;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.season-btn-icon .ico {
+  width: 15px;
+  height: 15px;
+  stroke: #c4b595;
+  transition: stroke 0.3s ease;
+}
+
+.season-btn:hover .season-btn-icon .ico,
+.season-btn.is-active .season-btn-icon .ico {
+  stroke: var(--gold-accent);
+}
+
+.season-btn-range {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  opacity: 0.78;
+  margin-top: 1px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.season-btn:hover {
+  color: var(--ivory);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.season-btn:focus-visible {
+  outline: none;
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 0 2px rgba(229, 185, 103, 0.35);
+}
+
+/* الموسم المختار حالياً */
+.season-btn.is-active {
+  color: var(--ivory);
+  background: var(--glass-bg);
+  border-color: rgba(255, 255, 255, 0.14);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.season-btn.is-active .season-btn-name {
+  color: #f6e7bd;
+  font-weight: 700;
+}
+
+.season-btn.is-active .season-btn-range {
+  color: #f1dfb6;
+  opacity: 0.95;
+}
+
+.season-btn.is-active .season-btn-icon {
+  transform: scale(1.18);
+  opacity: 1;
+}
+
+/* وسم نقطي خفيف للموسم الحالي لليوم */
+.season-btn.is-current::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #73f2a8;
+  box-shadow: 0 0 8px #73f2a8;
+}
+
+/* فاصل رأسي رفيع قبل زر اليوم الحالي */
+.timeline-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(229, 185, 103, 0.2);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* زر «اليوم الحالي» لإرجاع المشهد فوراً لطالع الليلة الحقيقي */
+.today-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: linear-gradient(180deg,
+      rgba(115, 242, 168, 0.14) 0%,
+      rgba(10, 16, 28, 0.45) 100%);
+  border: 1px solid rgba(115, 242, 168, 0.38);
+  border-radius: 999px;
+  color: #d1fae5;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 14px rgba(115, 242, 168, 0.12);
+}
+
+.today-btn:hover {
+  color: #ffffff;
+  border-color: rgba(115, 242, 168, 0.75);
+  background: rgba(115, 242, 168, 0.22);
+  box-shadow: 0 0 20px rgba(115, 242, 168, 0.28);
+  transform: translateY(-1px);
+}
+
+.today-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(115, 242, 168, 0.45),
+    0 0 20px rgba(115, 242, 168, 0.28);
+}
+
+.today-btn.is-today-active {
+  background: linear-gradient(180deg,
+      rgba(115, 242, 168, 0.26) 0%,
+      rgba(115, 242, 168, 0.1) 100%);
+  border-color: rgba(115, 242, 168, 0.7);
+  color: #ffffff;
+}
+
+.today-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #73f2a8;
+  box-shadow: 0 0 8px #73f2a8;
+  animation: today-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes today-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+}
+
+/* شريط بيئي وصفي رقيق أسفل الخط الزمني */
+.timeline-weather-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-family: 'Tajawal', sans-serif;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  /* سطر واحد ثابت: يمنع نمو ارتفاع الشريط وظهور تداخل أسفل الصفحة */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.timeline-weather-hint strong {
+  color: #f0e2bf;
+  font-weight: 600;
+}
+
+/* ============================================================================
+ * 7) زر التحكم بالصوت: دائري زجاجي أعلى اليسار بحالة واضحة
+ * ========================================================================== */
+.aa-sound {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  color: var(--gold-accent);
+  opacity: 0.85;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.25s ease, opacity 0.3s ease, color 0.3s ease;
+}
+
+.aa-sound:hover,
+.aa-sound:focus-visible {
+  opacity: 1;
+  outline: none;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.aa-sound svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.aa-sound .aa-wave {
+  opacity: 0;
+}
+
+.aa-sound .aa-slash {
+  display: none;
+}
+
+/* الحالة: مكتوم — شارب كتم ولون خافت */
+.aa-sound.is-off {
+  color: var(--text-muted);
+}
+
+.aa-sound.is-off .aa-wave {
+  display: none;
+}
+
+.aa-sound.is-off .aa-slash {
+  display: block;
+}
+
+/* الحالة: مفعّل — ذبذبات متحركة + توهج ذهبي حيّ */
+.aa-sound.is-on {
+  opacity: 1;
+  color: var(--gold-accent);
+  border-color: rgba(212, 175, 55, 0.45);
+  animation: aa-glow 2.6s ease-in-out infinite;
+}
+
+.aa-sound.is-on .aa-wave {
+  animation: aa-wave 1.8s ease-in-out infinite;
+}
+
+@keyframes aa-wave {
+
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes aa-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 12px rgba(229, 185, 103, 0.22);
+  }
+
+  50% {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 22px rgba(229, 185, 103, 0.5);
+  }
+}
+
+/* ============================================================================
+ * 7.b) منتقي المدينة: زر زجاجي في الزاوية العلوية اليسرى + قائمة منسدلة
+ * ========================================================================== */
+
+.city-picker {
+  position: fixed;
+  top: 16px;
+  left: 72px;                 /* بجانب زر الصوت (44px + 16px + 12px فاصل) */
+  z-index: 40;
+}
+
+.city-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  color: var(--gold-accent);
+  font-family: 'Tajawal', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease,
+              transform 0.25s ease, opacity 0.3s ease;
+}
+
+.city-btn:hover,
+.city-btn:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 22px rgba(212, 175, 55, 0.16);
+}
+
+.city-pin { width: 15px; height: 15px; flex: 0 0 auto; }
+
+.city-btn-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f3d9a2;
+  max-width: 34vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.city-btn-chevron {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+  transition: transform 0.3s ease;
+}
+
+.city-picker.is-open .city-btn-chevron { transform: rotate(180deg); }
+
+/* القائمة الزجاجية المنخفضة تحت الزر */
+.city-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(78vw, 260px);
+  padding: 12px 10px 10px;
+  background:
+    radial-gradient(circle at 15% 8%, rgba(212, 175, 55, 0.05) 0%, transparent 48%),
+    var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: var(--glass-blur) saturate(1.2);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.2);
+  box-shadow: var(--glass-shadow), 0 0 30px rgba(212, 175, 55, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top left;
+  transition: opacity 0.28s ease, transform 0.3s var(--ease-soft),
+              visibility 0s linear 0.3s;
+}
+
+.city-picker.is-open .city-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.28s ease, transform 0.3s var(--ease-soft),
+              visibility 0s linear 0s;
+}
+
+.city-menu-head {
+  padding: 0 6px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--gold-accent);
+}
+
+/* قائمة المدن قابلة للتمرير عند طولها */
+.city-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: min(46vh, 300px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 185, 103, 0.4) transparent;
+}
+
+.city-list::-webkit-scrollbar { width: 6px; }
+.city-list::-webkit-scrollbar-thumb {
+  background: rgba(229, 185, 103, 0.35);
+  border-radius: 3px;
+}
+
+.city-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: start;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.8rem;
+  color: #dbe4f2;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.city-item:hover,
+.city-item:focus-visible {
+  outline: none;
+  color: #fff6e2;
+  background: rgba(229, 185, 103, 0.12);
+}
+
+.city-item-region {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* المدينة المختارة حالياً */
+.city-item.is-active {
+  color: #fff2d2;
+  background: rgba(229, 185, 103, 0.18);
+  font-weight: 600;
+}
+
+.city-item.is-active::after {
+  content: '✓';
+  color: var(--gold-accent);
+  font-size: 0.72rem;
+}
+
+/* زر تحديد الموقع: خيار داخلي اختياري */
+.city-geo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 7px;
+  padding: 9px 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #d1fae5;
+  background: linear-gradient(180deg,
+    rgba(115, 242, 168, 0.14) 0%,
+    rgba(10, 16, 28, 0.45) 100%);
+  border: 1px solid rgba(115, 242, 168, 0.38);
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.25s ease, background 0.25s ease,
+              box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.city-geo svg { width: 14px; height: 14px; flex: 0 0 auto; }
+
+.city-geo:hover,
+.city-geo:focus-visible {
+  outline: none;
+  color: #ffffff;
+  border-color: rgba(115, 242, 168, 0.75);
+  background: rgba(115, 242, 168, 0.2);
+  box-shadow: 0 0 18px rgba(115, 242, 168, 0.24);
+}
+
+.city-geo.is-busy { opacity: 0.7; pointer-events: none; }
+
+.city-menu-note {
+  margin: 7px 4px 0;
+  font-size: 0.64rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+/* ============================================================================
+ * 8) أزرار البطاقة والإشعار الناعم
+ * ========================================================================== */
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-action-btn {
+  touch-action: manipulation;   /* يُلغي تأخير الضغط البالغ 300ms على الجوال */
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 18px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--gold-soft);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease,
+    box-shadow 0.3s ease, transform 0.25s ease;
+}
+
+.card-action-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.card-action-btn:hover,
+.card-action-btn:focus-visible {
+  color: #fffaf0;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 26, 0.82);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.2);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.card-action-icon {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+}
+
+/* حالة التحضير أثناء التقاط الصورة + وميض خفيف على البطاقة */
+.card-action-btn.is-busy {
+  opacity: 0.8;
+  pointer-events: none;
+  animation: save-pulse 1s ease-in-out infinite;
+}
+
+@keyframes save-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(229, 185, 103, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 18px rgba(229, 185, 103, 0.45);
+  }
+}
+
+.talea-card.is-flashing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(circle at 50% 40%,
+      rgba(229, 185, 103, 0.4) 0%,
+      rgba(229, 185, 103, 0.04) 72%);
+  animation: card-flash 0.42s ease-out forwards;
+}
+
+@keyframes card-flash {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* إشعار النسخ الناعم (يظهر فوق الشريط الثابت أسفل الشاشة) */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--dock-bottom) + 162px);
+  transform: translateX(-50%) translateY(12px);
+  z-index: 70;
+  padding: 10px 22px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #151005;
+  background: linear-gradient(180deg, #f7e3b6 0%, var(--gold-accent) 100%);
+  border: 1px solid rgba(255, 246, 226, 0.65);
+  border-radius: 999px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45), 0 0 22px rgba(229, 185, 103, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  max-width: min(88vw, 420px);
+  text-align: center;
+  transition: opacity 0.35s ease, transform 0.4s var(--ease-soft);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.error {
+  color: #ffe9e6;
+  background: linear-gradient(180deg, #8c3a34 0%, #5e211d 100%);
+  border-color: rgba(255, 180, 170, 0.5);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+ * 9) نافذة النبذة الزجاجية (Modal)
+ * ========================================================================== */
+
+.info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.info-modal.is-open {
+  display: flex;
+}
+
+.info-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 13, 0.66);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.info-sheet {
+  position: relative;
+  width: min(92vw, 560px);
+  max-height: min(84vh, 660px);
+  overflow-y: auto;
+  padding: 26px 24px 24px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: var(--glass-blur) saturate(1.2);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.2);
+  box-shadow: var(--glass-shadow), var(--glass-inset),
+    0 0 40px rgba(212, 175, 55, 0.08);
+  animation: info-in 0.4s var(--ease-soft);
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes info-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.info-close {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.info-close:hover,
+.info-close:focus-visible {
+  color: var(--gold-accent);
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(229, 185, 103, 0.14);
+  outline: none;
+}
+
+.info-kicker {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.info-sheet h3 {
+  font-family: 'Amiri', serif;
+  font-size: 1.55rem;
+  color: var(--gold-accent);
+  margin-bottom: 4px;
+  padding-inline-end: 36px;
+}
+
+.info-range {
+  display: inline-block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.info-para {
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--text-main);
+  opacity: 0.92;
+  margin-bottom: 10px;
+}
+
+.info-para-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.info-para-quote {
+  font-family: 'Amiri', serif;
+  color: #f0e2bf;
+  font-size: 1.02rem;
+  opacity: 1;
+}
+
+.info-block {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(229, 185, 103, 0.22);
+}
+
+.info-block h4 {
+  font-size: 0.8rem;
+  color: var(--gold-accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-list li {
+  position: relative;
+  padding-inline-start: 18px;
+  font-size: 0.87rem;
+  line-height: 1.7;
+  color: var(--text-main);
+  opacity: 0.9;
+}
+
+.info-list li::before {
+  content: '✦';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  color: var(--gold-accent);
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+/* قائمة الدليل العملي: أيقونة خطية بدل النقطة الذهبية */
+.info-list-icons li {
+  padding-inline-start: 26px;
+  line-height: 1.8;
+}
+
+.info-list-icons li::before { display: none; }
+
+.info-li-icon {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 4px;
+  width: 15px;
+  height: 15px;
+  stroke: #c4b595;
+  vertical-align: middle;
+  opacity: 0.9;
+}
+
+.info-list-icons strong {
+  color: #f0e2bf;
+  font-weight: 600;
+}
+
+.info-date {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* ============================================================================
+ * 10) نافذة التقويم الفلكي: زجاجية بتقويم مخصص (ميلادي/هجري)
+ * ========================================================================== */
+
+.date-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+
+.date-modal.is-open {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.35s ease, visibility 0s linear 0s;
+}
+
+.date-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 14, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.date-sheet {
+  position: relative;
+  width: min(380px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(212, 175, 55, 0.05) 0%, transparent 46%),
+    radial-gradient(circle at 84% 88%, rgba(45, 85, 125, 0.12) 0%, transparent 44%),
+    var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 30px 20px 20px;
+  text-align: center;
+  box-shadow: var(--glass-shadow), 0 0 40px rgba(212, 175, 55, 0.07);
+  backdrop-filter: var(--glass-blur) saturate(1.15);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(1.15);
+  transform: translateY(14px) scale(0.97);
+  transition: transform 0.35s var(--ease-soft);
+}
+
+.date-modal.is-open .date-sheet {
+  transform: none;
+}
+
+.date-close {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.date-close:hover,
+.date-close:focus-visible {
+  color: var(--gold-accent);
+  border-color: rgba(229, 185, 103, 0.5);
+  outline: none;
+}
+
+.date-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--gold-accent);
+  background: rgba(10, 14, 26, 0.65);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 999px;
+  padding: 3px 14px;
+  margin-bottom: 12px;
+}
+
+.date-sheet h3 {
+  font-family: 'Amiri', serif;
+  font-size: 1.4rem;
+  color: var(--text-main);
+  margin: 0 0 14px;
+}
+
+/* مفتاح التقويم: تبديل بين الميلادي والهجري */
+.cal-switch {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  margin: 0 auto 16px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.cal-tab {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cal-tab:hover {
+  color: #e8eefb;
+}
+
+.cal-tab.is-active {
+  color: var(--ivory);
+  background: rgba(10, 14, 26, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cal-tab:focus-visible {
+  outline: 2px solid rgba(229, 185, 103, 0.75);
+  outline-offset: 2px;
+}
+
+/* رأس الشهر: سهمان + قائمتان منسدلتان زجاجيتان (الشهر والسنة) */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* صفّ القائمتين: يأخذ المساحة الوسطى بين السهمين */
+.cal-pickers {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* غلاف القائمة: عرضه بحسب محتواه — فلا تُقصّ نصوص الشهور أو السنوات */
+.cal-select-wrap {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
+}
+
+/* القائمة المنسدلة نفسها: زجاج داكن مطابق للهوية دون حواف المتصفح */
+.cal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  padding: 7px 12px 7px 28px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: center;
+  text-align-last: center;
+  text-overflow: ellipsis;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(229, 185, 103, 0.3);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, border-color 0.25s ease,
+    background 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* عرض السنة يتبع محتواها مع أرقام ثابتة العرض فلا ترتجف */
+.cal-select-year {
+  min-width: 5.8em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-select:hover {
+  color: #fff6e2;
+  border-color: rgba(229, 185, 103, 0.7);
+  background: rgba(229, 185, 103, 0.1);
+  box-shadow: 0 0 16px rgba(229, 185, 103, 0.22);
+}
+
+.cal-select:focus-visible {
+  outline: none;
+  color: #fff6e2;
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 0 2px rgba(229, 185, 103, 0.35),
+    0 0 18px rgba(229, 185, 103, 0.3);
+}
+
+/* سهيم صغير يدلّ على أنها قائمة منسدلة (العنصر الأصلي مخفي) */
+.cal-select-chevron {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--gold-accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* قائمة الخيارات المنسدلة (تُرسم بخط داكن في أغلب المتصفحات) */
+.cal-select option {
+  background: #0d1422;
+  color: #e8eefb;
+}
+
+.cal-nav {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(229, 185, 103, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold-accent);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease,
+    box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.cal-nav:hover,
+.cal-nav:focus-visible {
+  color: #fff6e2;
+  border-color: rgba(229, 185, 103, 0.75);
+  box-shadow: 0 0 16px rgba(229, 185, 103, 0.3);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* سطر أسماء الأسبوع وشبكة الأيام (7 أعمدة) */
+.cal-week,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.cal-week {
+  margin-bottom: 7px;
+}
+
+.cal-weekday {
+  padding-bottom: 3px;
+  font-size: 0.66rem;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(229, 185, 103, 0.14);
+}
+
+.cal-pad {
+  display: block;
+}
+
+.cal-day {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #dbe4f2;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, background 0.25s ease,
+    border-color 0.25s ease, box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.cal-day:hover,
+.cal-day:focus-visible {
+  color: #fff6e2;
+  background: rgba(229, 185, 103, 0.14);
+  border-color: rgba(229, 185, 103, 0.7);
+  box-shadow: 0 0 18px rgba(229, 185, 103, 0.3),
+    inset 0 0 12px rgba(229, 185, 103, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* اليوم الحالي: عمود ذهبي دقيق يدل عليه دون ضجيج */
+.cal-day.is-today {
+  color: #fff2d2;
+  font-weight: 700;
+  background: linear-gradient(180deg,
+      rgba(229, 185, 103, 0.24) 0%,
+      rgba(229, 185, 103, 0.06) 100%);
+  border-color: rgba(229, 185, 103, 0.85);
+  box-shadow: 0 0 20px rgba(229, 185, 103, 0.35);
+}
+
+.cal-day.is-today::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--gold-accent);
+  box-shadow: 0 0 8px rgba(229, 185, 103, 0.9);
+}
+
+.date-hint {
+  min-height: 1.4em;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+ * 11) سطر الطقس المباشر وويدجت الطقس ودليل الطالع العملي
+ * ========================================================================== */
+
+/* ويدجت الطقس داخل البطاقة: زجاج خافت يفصل معلومة الطقس عن المتن.
+   يُعرض لطالع اليوم فقط، فيُخفى بـ hidden عند تصفّح بقية الطوالع */
+.weather-widget {
+  margin-top: 14px;
+  padding: 11px 13px;
+  text-align: start;
+  background: rgba(10, 14, 26, 0.65);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.weather-widget[hidden],
+.weather-widget.is-hidden {
+  display: none !important;
+}
+
+/* زاوية الرصد تُعرض دائماً — لكنها تبقى زجاجية إن خُفي ويدجت الطقس.
+   وعند الإخفاء تنتقل الزاوية إلى صندوق مستقل أدنى. */
+.ww-sight-standalone {
+  margin-top: 14px;
+  padding: 11px 13px;
+  text-align: start;
+  background: rgba(10, 14, 26, 0.65);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  font-size: 0.76rem;
+  line-height: 1.75;
+  color: #cfd9e8;
+}
+
+.ww-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ww-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--gold-accent);
+  letter-spacing: 0.3px;
+}
+
+.ww-city svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+/* شرائح القياس: ٤٢° · رياح ١٢ كم/س شمالية */
+.ww-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ww-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  color: #dbe4f2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ww-chip svg {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  opacity: 0.8;
+}
+
+/* السطر البلاغي الذي يربط المثل بالطقس الفعلي */
+.live-weather {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+}
+
+.live-weather.is-live { color: #d9e4f5; }
+.live-weather.is-clickable { cursor: pointer; }
+
+.live-weather.is-clickable:hover,
+.live-weather.is-clickable:focus-visible { color: var(--gold-accent); }
+
+/* زاوية رصد النجم */
+.ww-sight {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(229, 185, 103, 0.18);
+  font-size: 0.74rem;
+  line-height: 1.7;
+  color: #cfd9e8;
+}
+
+.ww-sight-label {
+  display: inline-block;
+  margin-inline-end: 6px;
+  padding: 1px 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--gold-accent);
+  background: rgba(229, 185, 103, 0.12);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* دليل الطالع العملي: زراعة وغرس + نمط حياة ومناخ */
+.agro-guide {
+  margin-top: 12px;
+  padding: 12px 13px;
+  text-align: start;
+  background: rgba(10, 14, 26, 0.65);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.agro-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.agro-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--gold-accent);
+}
+
+/* خط ذهبي رفيع يمتد بعد العنوان */
+.agro-head::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), transparent);
+}
+
+.agro-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+/* أيقونة خطية رفيعة بجانب كل بند — ترث لون النص عبر currentColor */
+.agro-icon {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;          /* محاذاة رأسية متوازنة مع سطر العنوان */
+  stroke: #c4b595;         /* عاجيّ ترابي خافت يتبع هوية المشروع */
+  vertical-align: middle;
+  opacity: 0.9;
+  transition: stroke 0.3s ease, opacity 0.3s ease;
+}
+
+.agro-item:hover .agro-icon {
+  stroke: var(--gold-accent);
+  opacity: 1;
+}
+
+.agro-body { min-width: 0; }
+
+.agro-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #f0e2bf;
+  margin-bottom: 2px;
+}
+
+.agro-text {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+ * 12) الوسائط المتجاوبة واحترام تقليل الحركة
+ * ========================================================================== */
+
+@media (max-width: 600px) {
+  body {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* الكتلة العلوية على الجوال: تثبيت أقرب للحافة ومقاس أصغر،
+     مع تصغير حشوة الحاوية كي لا يترك العنوان فراغاً كبيراً */
+  .site-header {
+    top: clamp(10px, 2.2vh, 20px);
+    padding: 0 14px;
+  }
+
+  .container {
+    padding-top: clamp(104px, 19vh, 150px);
+  }
+
+  .site-title {
+    font-size: clamp(2.5rem, 14vw, 3.2rem);
+    letter-spacing: 0;
+  }
+
+  .site-sub {
+    font-size: 0.86rem;
+    letter-spacing: 0.8px;
+  }
+
+  /* البطاقة والأزرار والإشعار والنافذة */
+  .talea-card { padding: 48px 16px 24px; }
+
+  /* شريط تمرير رفيع داخل البطاقة على الجوال */
+  .talea-card::-webkit-scrollbar { width: 5px; }
+  .talea-card::-webkit-scrollbar-thumb {
+    background: rgba(229, 185, 103, 0.35);
+    border-radius: 3px;
+  }
+
+  .card-actions {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .card-action-btn {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+  }
+
+  .hero-actions {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100vw - 24px);
+  }
+
+  .observe-btn {
+    padding: 13px 26px;
+    font-size: 1.05rem;
+  }
+
+  .timeline-bar {
+    width: calc(100vw - 16px);
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    gap: 4px;
+  }
+
+  .timeline-nav {
+    padding: 4px 6px;
+    gap: 3px;
+  }
+
+  .season-btn {
+    min-width: 70px;
+    padding: 5px 9px;
+  }
+
+  .season-btn-name {
+    font-size: 0.88rem;
+  }
+
+  .season-btn-range {
+    font-size: 0.58rem;
+  }
+
+  .today-btn {
+    padding: 6px 11px;
+    font-size: 0.72rem;
+  }
+
+  .timeline-weather-hint {
+    font-size: 0.64rem;
+  }
+
+  .toast {
+    bottom: calc(161px + env(safe-area-inset-bottom, 0px));
+    font-size: 0.8rem;
+    padding: 9px 18px;
+  }
+
+  .date-sheet {
+    padding: 26px 14px 16px;
+  }
+
+  .date-sheet h3 {
+    font-size: 1.2rem;
+  }
+
+  .cal-tab { padding: 6px 13px; font-size: 0.78rem; }
+  .cal-head { gap: 5px; }
+  .cal-pickers { gap: 4px; }
+  .cal-select { padding: 6px 10px 6px 23px; font-size: 0.74rem; }
+  .cal-select-year { min-width: 5.1em; }
+  .cal-select-chevron { left: 8px; width: 11px; height: 11px; }
+
+  .cal-week,
+  .cal-grid {
+    gap: 4px;
+  }
+
+  .cal-weekday {
+    font-size: 0.6rem;
+  }
+
+  .cal-day {
+    min-height: 34px;
+    font-size: 0.78rem;
+    border-radius: 9px;
+  }
+
+    .info-modal { padding: 12px; }
+    .info-sheet { width: 100%; max-height: 86vh; padding: 22px 16px 18px; }
+    .info-sheet h3 { font-size: 1.35rem; }
+    .info-para { font-size: 0.88rem; line-height: 1.75; }
+
+    /* منتقي المدينة والويدجت والدليل على الشاشات الضيقة */
+    .city-picker { top: 12px; left: 64px; }
+    .city-btn { height: 40px; padding: 0 10px; gap: 5px; }
+    .city-btn-name { font-size: 0.72rem; max-width: 30vw; }
+    .city-menu { width: min(86vw, 250px); padding: 10px 8px 8px; }
+
+    .weather-widget,
+    .agro-guide { padding: 11px 12px; }
+    .ww-chip { font-size: 0.66rem; padding: 2px 8px; }
+    .live-weather { font-size: 0.76rem; }
+    .ww-sight { font-size: 0.72rem; }
+    .agro-text { font-size: 0.74rem; }
+  }
+
+  /* احترام تفضيل تقليل الحركة */
+  @media (prefers-reduced-motion: reduce) {
+    .city-btn,
+    .city-menu,
+    .city-btn-chevron,
+    .city-geo {
+      transition-duration: 0.15s;
+    }
+
+    .city-btn:hover,
+    .city-btn:focus-visible {
+      transform: none;
+    }
+
+  .today-dot,
+  .site-title,
+  .observe-btn,
+  .observe-star,
+  .observe-gleam,
+  .aa-sound.is-on,
+  .aa-sound.is-on .aa-wave {
+    animation: none;
+  }
+
+  /* انتقال الطوالع يصبح فورياً بلا حركة (احترام تقليل الحركة) */
+  body.is-swapping .talea-card>* {
+    transition-duration: 0.01s;
+    transform: none;
+  }
+
+  .aa-sound,
+  .aa-sound:hover,
+  .aa-sound:focus-visible {
+    transition-duration: 0.15s;
+    transform: none;
+  }
+
+  .aa-sound.is-on {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 16px rgba(229, 185, 103, 0.4);
+  }
+
+  .aa-sound.is-on .aa-wave {
+    opacity: 0.9;
+  }
+
+  .season-btn,
+  .today-btn,
+  .timeline-bar {
+    transition-duration: 0.15s;
+  }
+
+  .cal-day,
+  .cal-nav,
+  .cal-tab {
+    transition-duration: 0.01s;
+  }
+
+  .cal-day:hover,
+  .cal-nav:hover {
+    transform: none;
+  }
+
+  .talea-card,
+  .card-glow,
+  body.is-observed .talea-card,
+  body.is-observed .card-glow {
+    transition-duration: 0.35s;
+  }
+
+  body.is-observed .talea-card>* {
+    transition-delay: 0.05s;
+  }
+}

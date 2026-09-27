@@ -1,0 +1,13 @@
+# robots.txt — مرصد أَنْوَاء
+# يسمح بالزحف لكافة محركات البحث مع الاستثناءات المعتادة.
+
+User-agent: *
+Allow: /
+
+# لا فائدة من فهرسة ملفات المشروع الخام
+Disallow: /test/
+Disallow: /*.js$
+Disallow: /*.css$
+
+# اسمح لخوالب البحث بالوصول إلى الصفحة freely
+Allow: /index.html
