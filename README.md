@@ -104,6 +104,7 @@ with modern front-end craftsmanship.
 
 ### 🖼️ Screenshot
 
+<br>
 ![Uploading Screenshot 2026-09-27 081736.png…]()
 
 <br><br>
