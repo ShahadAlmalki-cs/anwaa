@@ -1071,6 +1071,27 @@
     return lines.length;
   }
 
+  /** تجزئة نص عربي إلى قائمة أسطر متوسطة داخل عرض معيّن (بلا رسم) */
+  function wrapCenteredLines(g, text, maxWidth) {
+    var words = String(text).split(' ');
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (g.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = words[i];
+      } else { line = test; }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  /** رسم قائمة أسطر جاهزة متوسطة الأفق انطلاقاً من أول baseline */
+  function drawCenteredWrappedLines(g, lines, x, firstBaseline, lineHeight) {
+    for (var j = 0; j < lines.length; j++) g.fillText(lines[j], x, firstBaseline + j * lineHeight);
+  }
+
   /** تنظيف اسم الطالع لتصير صالحاً كاسم ملف: ستوري-طالع-الزبرة.png */
   function cardFileName(name, prefix) {
     var safe = String(name || 'الطالع')
@@ -1141,24 +1162,24 @@
     roundRectPath(g, 44, 44, W - 88, H - 88, 40);
     g.stroke();
 
-    // 5) الترويسة: الشعار بخط عريق والعبارة المباركة
+    // 5) الترويسة: الشعار بخط عريق والعبارة المباركة (مكتنزة عمودياً لمساحة أكبر للمتن)
     g.textAlign = 'center';
     g.textBaseline = 'alphabetic';
     g.fillStyle = '#e5b967';
-    g.font = '700 150px Amiri, serif';
-    g.fillText('أَنْوَاء', W / 2, 235);
+    g.font = '700 122px Amiri, serif';
+    g.fillText('أَنْوَاء', W / 2, 208);
     g.fillStyle = '#8b9bb4';
-    g.font = '500 42px Tajawal, sans-serif';
-    g.fillText('مَطَالِعُ النُّجُومِ وَقَوَاسِيمُ الأَرْضِ', W / 2, 322);
+    g.font = '500 38px Tajawal, sans-serif';
+    g.fillText('مَطَالِعُ النُّجُومِ وَقَوَاسِيمُ الأَرْضِ', W / 2, 278);
     g.strokeStyle = 'rgba(229, 185, 103, 0.5)';
     g.lineWidth = 2;
     g.beginPath();
-    g.moveTo(W / 2 - 170, 374);
-    g.lineTo(W / 2 + 170, 374);
+    g.moveTo(W / 2 - 170, 322);
+    g.lineTo(W / 2 + 170, 322);
     g.stroke();
     g.fillStyle = '#e5b967';
-    g.font = '34px Tajawal, sans-serif';
-    g.fillText('✧', W / 2, 392);
+    g.font = '30px Tajawal, sans-serif';
+    g.fillText('✧', W / 2, 340);
 
     drawStoryBody(g, W, H, rng, talea, seasonLabel);
   }
@@ -1166,9 +1187,9 @@
   /** متن البطاقة: زجاج + كوكبة خافتة + اسم الطالع والموسم والمثل + التذييل */
   function drawStoryBody(g, W, H, rng, talea, seasonLabel) {
     var cx = 90;
-    var cy = 620;
+    var cy = 420;
     var cw = W - 180;
-    var ch = 830;
+    var ch = 1070;
     var cr = 56;
 
     // 6) البطاقة الزجاجية الفاخرة في المنتصف
@@ -1212,28 +1233,28 @@
       g.fill();
     }
 
-    // 7) اسم الطالع ثم الموسم بهالة ذهبية ثم المثل الشعبي منسّقاً
+    // 7) هوية الطالع: كلمة تعريفية ثم الاسم ثم شارة الموسم
     g.textAlign = 'center';
     g.fillStyle = '#8b9bb4';
-    g.font = '500 36px Tajawal, sans-serif';
-    g.fillText('طالعُ الليلة', W / 2, cy + 110);
+    g.font = '500 34px Tajawal, sans-serif';
+    g.fillText('طالعُ الليلة', W / 2, cy + 100);
 
     g.fillStyle = '#f7e3b6';
-    g.font = '700 132px Amiri, serif';
-    g.fillText(talea.name, W / 2, cy + 268);
+    g.font = '700 126px Amiri, serif';
+    g.fillText(talea.name, W / 2, cy + 246);
 
-    g.font = '500 46px Tajawal, sans-serif';
+    g.font = '500 44px Tajawal, sans-serif';
     var seasonText = 'موسم ' + seasonLabel;
-    var pw = g.measureText(seasonText).width + 120;
-    var ph = 92;
+    var pw = g.measureText(seasonText).width + 110;
+    var ph = 88;
     var px = (W - pw) / 2;
-    var py = cy + 320;
+    var py = cy + 296;
     var halo = g.createRadialGradient(W / 2, py + ph / 2, 0, W / 2, py + ph / 2, pw * 0.75);
     halo.addColorStop(0, 'rgba(229, 185, 103, 0.32)');
     halo.addColorStop(1, 'rgba(229, 185, 103, 0)');
     g.fillStyle = halo;
     g.fillRect(px - 120, py - 70, pw + 240, ph + 140);
-    roundRectPath(g, px, py, pw, ph, 46);
+    roundRectPath(g, px, py, pw, ph, 44);
     g.fillStyle = 'rgba(229, 185, 103, 0.12)';
     g.fill();
     g.strokeStyle = 'rgba(229, 185, 103, 0.8)';
@@ -1244,59 +1265,66 @@
     g.fillText(seasonText, W / 2, py + ph / 2 + 3);
     g.textBaseline = 'alphabetic';
 
-    g.fillStyle = '#e8e2d2';
-    g.font = 'italic 400 54px Amiri, serif';
-    drawCenteredWrapped(g, '«' + talea.proverb + '»', W / 2, cy + 560, cw - 150, 84);
-
-    // دليل عملي مختصر في أسفل البطاقة: زراعة + مناخ
-    // عنوان الدليل فوق الشتلة المرسومة خطياً (بلا إيموجي)
-    g.font = '500 34px Tajawal, sans-serif';
-    g.fillStyle = 'rgba(229, 185, 103, 0.9)';
-    g.fillText('دليل الطالع العملي', W / 2, cy + ch - 128);
-
-    g.save();
-    g.strokeStyle = 'rgba(229, 185, 103, 0.72)';
-    g.lineWidth = 2.4;
-    g.lineCap = 'round';
-    g.lineJoin = 'round';
-    var sx = W / 2;
-    var sy = cy + ch - 148;
-    g.beginPath();
-    g.moveTo(sx, sy + 13);
-    g.lineTo(sx, sy);
-    g.moveTo(sx, sy + 2);
-    g.bezierCurveTo(sx, sy - 4, sx - 6, sy - 6, sx - 9, sy - 5);
-    g.moveTo(sx, sy + 1);
-    g.bezierCurveTo(sx, sy - 5, sx + 6, sy - 7, sx + 9, sy - 6);
+    // المثل الشعبي داخل حاوية اقتباس هادئة تُبرزه دون تكديس
+    var qw = cw - 130;
+    var qx = (W - qw) / 2;
+    g.font = 'italic 400 50px Amiri, serif';
+    var qLines = wrapCenteredLines(g, '«' + talea.proverb + '»', qw);
+    var qLineH = 76;
+    var qh = qLines.length * qLineH + 84;
+    var qy = cy + 440;
+    roundRectPath(g, qx, qy, qw, qh, 36);
+    g.fillStyle = 'rgba(255, 255, 255, 0.045)';
+    g.fill();
+    g.strokeStyle = 'rgba(229, 185, 103, 0.28)';
+    g.lineWidth = 1.5;
     g.stroke();
-    g.restore();
+    g.fillStyle = '#e8e2d2';
+    drawCenteredWrappedLines(g, qLines, W / 2, qy + 78, qLineH);
 
-    g.font = '400 32px Tajawal, sans-serif';
+    // فاصل ذهبي صغير يفصل الاقتباس عن الدليل العملي
+    var dvy = qy + qh + 72;
+    g.strokeStyle = 'rgba(229, 185, 103, 0.45)';
+    g.lineWidth = 1.5;
+    g.beginPath();
+    g.moveTo(W / 2 - 110, dvy);
+    g.lineTo(W / 2 + 110, dvy);
+    g.stroke();
+    g.fillStyle = '#e5b967';
+    g.font = '26px Tajawal, sans-serif';
+    g.fillText('✦', W / 2, dvy + 9);
+
+    // الدليل العملي: عنوان مصغّر ثم نص الزراعة على سطر مضغوط واحد
+    g.font = '500 32px Tajawal, sans-serif';
+    g.fillStyle = 'rgba(229, 185, 103, 0.9)';
+    g.fillText('دليل الطالع العملي', W / 2, dvy + 78);
+
+    g.font = '400 33px Tajawal, sans-serif';
     g.fillStyle = 'rgba(207, 217, 232, 0.92)';
-    if (talea.farm) drawCenteredWrapped(g, talea.farm, W / 2, cy + ch - 74, cw - 130, 46);
+    if (talea.farm) drawCenteredWrapped(g, talea.farm, W / 2, dvy + 130, cw - 150, 48);
 
     g.fillStyle = 'rgba(229, 185, 103, 0.75)';
-    g.font = '34px Tajawal, sans-serif';
-    g.fillText('✦ ✦ ✦', W / 2, cy + ch + 4);
+    g.font = '30px Tajawal, sans-serif';
+    g.fillText('✦ ✦ ✦', W / 2, H - 402);
 
-    // 8) التذييل: التاريخ الهجري والميلادي وسطر التوثيق
+    // 8) التذييل: التاريخ الهجري ثم الميلادي ومتوافقان معهما سطر التوثيق (بتنفّس أوسع)
     g.fillStyle = '#c9d4e4';
     g.font = '500 40px Tajawal, sans-serif';
-    g.fillText(hijriText, W / 2, H - 300);
+    g.fillText(hijriText, W / 2, H - 336);
     g.fillStyle = '#8b9bb4';
     g.font = '300 34px Tajawal, sans-serif';
-    g.fillText(gregorianText, W / 2, H - 240);
+    g.fillText(gregorianText, W / 2, H - 272);
 
     g.strokeStyle = 'rgba(229, 185, 103, 0.4)';
     g.lineWidth = 1.5;
     g.beginPath();
-    g.moveTo(W / 2 - 130, H - 192);
-    g.lineTo(W / 2 + 130, H - 192);
+    g.moveTo(W / 2 - 130, H - 214);
+    g.lineTo(W / 2 + 130, H - 214);
     g.stroke();
 
     g.fillStyle = 'rgba(229, 185, 103, 0.85)';
     g.font = '500 32px Tajawal, sans-serif';
-    g.fillText('رُصِد عبر مَرصد أَنْوَاء', W / 2, H - 132);
+    g.fillText('رُصِد عبر مَرصد أَنْوَاء', W / 2, H - 146);
   }
 
   /** تنزيل ملف من الذاكرة المؤقتة كتحميل عادي */

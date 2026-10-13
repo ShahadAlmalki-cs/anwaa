@@ -750,9 +750,10 @@ async function runAudioScenario() {
     /if \(prefersLessMotion\(\)\) return;/.test(audioSrc));
   check('الصوت يبقى مكتوماً افتراضياً بعد التعديلات',
     /let enabled = false;/.test(audioSrc) && /let mutedByUser = true;/.test(audioSrc));
-  check('بطاقة الستوري تحمل الدليل العملي (بلا إيموجي)',
+  check('بطاقة الستوري تحمل الدليل العملي (بلا إيموجي، مع فاصل الاقتباس والدليل)',
     appSrc.indexOf('دليل الطالع العملي') !== -1 &&
-    /bezierCurveTo\(sx, sy - 4/.test(appSrc) &&
+    appSrc.indexOf('wrapCenteredLines') !== -1 &&
+    appSrc.indexOf('drawCenteredWrappedLines') !== -1 &&
     !/['"]\s*\\uD83C|🌱/.test(appSrc));
 
   /* ---- نظام الأيقونات الخطية: لا إيموجي ملوّنة في المشروع ----
